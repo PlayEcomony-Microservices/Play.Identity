@@ -3,18 +3,32 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using System;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Bson;
+using Play.Common.Settings;
+using Play.Identity.Service.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("IdentityDataContextConnection") ?? throw new InvalidOperationException("Connection string 'IdentityDataContextConnection' not found.");
 
-// builder.Services.AddDbContext<IdentityDataContext>(options => options.UseSqlServer(connectionString));
-
-// builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<IdentityDataContext>();
+var Configuration = builder.Configuration;
 
 var services = builder.Services;
+
+BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
+
+var serviceSettings = Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
+var mongoDbSettings = Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
+
+services.AddDefaultIdentity<ApplicationUser>()
+            .AddRoles<ApplicationRole>()
+            .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>
+            (
+                mongoDbSettings.ConnectionString,
+                serviceSettings.ServiceName
+            );
 
 services.AddControllers();
 
@@ -36,10 +50,13 @@ if(app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
 app.UseRouting();
 
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapRazorPages();
 
 app.Run();
