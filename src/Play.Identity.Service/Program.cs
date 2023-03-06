@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Identity;
 using System;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Bson.Serialization;
@@ -10,6 +9,7 @@ using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Bson;
 using Play.Common.Settings;
 using Play.Identity.Service.Entities;
+using Play.Identity.Service.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,14 +21,21 @@ BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
 
 var serviceSettings = Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
 var mongoDbSettings = Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
+var identityServerSettings = new IdentityServerSettings();
 
 services.AddDefaultIdentity<ApplicationUser>()
-            .AddRoles<ApplicationRole>()
-            .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>
-            (
-                mongoDbSettings.ConnectionString,
-                serviceSettings.ServiceName
-            );
+        .AddRoles<ApplicationRole>()
+        .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>
+        (
+            mongoDbSettings.ConnectionString,
+            serviceSettings.ServiceName
+        );
+
+services.AddIdentityServer()
+        .AddAspNetIdentity<ApplicationUser>()
+        .AddInMemoryApiScopes(identityServerSettings.ApiScopes)
+        .AddInMemoryClients(identityServerSettings.Clients)
+        .AddInMemoryIdentityResources(identityServerSettings.IdentityResources);
 
 services.AddControllers();
 
@@ -53,6 +60,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseIdentityServer();
 
 app.UseAuthorization();
 
