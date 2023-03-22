@@ -43,6 +43,8 @@ services.AddIdentityServer(options =>
         .AddInMemoryClients(identityServerSettings.Clients)
         .AddInMemoryIdentityResources(identityServerSettings.IdentityResources);
 
+services.AddLocalApiAuthentication();
+
 services.AddControllers();
 
 services.AddSwaggerGen(c =>
