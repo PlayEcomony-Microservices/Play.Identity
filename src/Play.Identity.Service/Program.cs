@@ -10,6 +10,7 @@ using MongoDB.Bson;
 using Play.Common.Settings;
 using Play.Identity.Service.Entities;
 using Play.Identity.Service.Settings;
+using Play.Identity.Service.HostedServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +24,8 @@ var serviceSettings = Configuration.GetSection(nameof(ServiceSettings)).Get<Serv
 var mongoDbSettings = Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
 var identityServerSettings = Configuration.GetSection(nameof(IdentityServerSettings)).Get<IdentityServerSettings>();
 
-services.AddDefaultIdentity<ApplicationUser>()
+services.Configure<IdentitySettings>(Configuration.GetSection(nameof(IdentitySettings)))
+       .AddDefaultIdentity<ApplicationUser>()
         .AddRoles<ApplicationRole>()
         .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>
         (
@@ -42,10 +44,13 @@ services.AddIdentityServer(options =>
         .AddInMemoryApiResources(identityServerSettings.ApiResources)
         .AddInMemoryClients(identityServerSettings.Clients)
         .AddInMemoryIdentityResources(identityServerSettings.IdentityResources);
+    
 
 services.AddLocalApiAuthentication();
 
 services.AddControllers();
+
+services.AddHostedService<IdentitySeedHostedService>();
 
 services.AddSwaggerGen(c =>
 {
