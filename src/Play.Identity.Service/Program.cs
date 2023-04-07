@@ -24,6 +24,8 @@ var serviceSettings = Configuration.GetSection(nameof(ServiceSettings)).Get<Serv
 var mongoDbSettings = Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
 var identityServerSettings = Configuration.GetSection(nameof(IdentityServerSettings)).Get<IdentityServerSettings>();
 
+const string AllowedOriginSetting = "AllowedOrigin";
+
 services.Configure<IdentitySettings>(Configuration.GetSection(nameof(IdentitySettings)))
        .AddDefaultIdentity<ApplicationUser>()
         .AddRoles<ApplicationRole>()
@@ -66,6 +68,13 @@ if(app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Play.Identity.Service v1"));
+
+
+    app.UseCors(builder =>{
+        builder.WithOrigins(Configuration[AllowedOriginSetting])
+        .AllowAnyHeader()
+        .AllowAnyHeader();
+    });
 }
 
 app.UseHttpsRedirection();
