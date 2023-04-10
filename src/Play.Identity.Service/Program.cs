@@ -11,6 +11,8 @@ using Play.Common.Settings;
 using Play.Identity.Service.Entities;
 using Play.Identity.Service.Settings;
 using Play.Identity.Service.HostedServices;
+using Microsoft.AspNetCore.Identity;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
