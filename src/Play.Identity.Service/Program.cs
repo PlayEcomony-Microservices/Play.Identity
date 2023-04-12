@@ -12,7 +12,9 @@ using Play.Identity.Service.Entities;
 using Play.Identity.Service.Settings;
 using Play.Identity.Service.HostedServices;
 using Microsoft.AspNetCore.Identity;
-
+using Play.Common.MassTransit;
+using MassTransit;
+using Play.Identity.Service.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +38,14 @@ services.Configure<IdentitySettings>(Configuration.GetSection(nameof(IdentitySet
             mongoDbSettings.ConnectionString,
             serviceSettings.ServiceName
         );
+
+services.AddMassTransitWithRabbitMq(retryConfigurator  => 
+{
+    retryConfigurator.Interval(3, TimeSpan.FromSeconds(4));
+
+    retryConfigurator.Ignore(typeof(UnknownUserException));
+    retryConfigurator.Ignore(typeof(InsufficientFundsException));
+});
 
 services.AddIdentityServer(options =>
         {
