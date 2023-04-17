@@ -14,6 +14,7 @@ using Play.Identity.Service.HostedServices;
 using Microsoft.AspNetCore.Identity;
 using Play.Common.MassTransit;
 using MassTransit;
+using GreenPipes;
 using Play.Identity.Service.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,6 +47,8 @@ services.AddMassTransitWithRabbitMq(retryConfigurator  =>
     retryConfigurator.Ignore(typeof(UnknownUserException));
     retryConfigurator.Ignore(typeof(InsufficientFundsException));
 });
+
+services.AddMassTransitHostedService();
 
 services.AddIdentityServer(options =>
         {
