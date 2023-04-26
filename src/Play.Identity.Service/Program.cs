@@ -48,7 +48,6 @@ services.AddMassTransitWithRabbitMq(retryConfigurator  =>
     retryConfigurator.Ignore(typeof(InsufficientFundsException));
 });
 
-services.AddMassTransitHostedService();
 
 services.AddIdentityServer(options =>
         {
