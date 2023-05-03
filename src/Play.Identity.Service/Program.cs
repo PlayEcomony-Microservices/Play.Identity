@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Identity;
 using Play.Common.MassTransit;
 using MassTransit;
 using Play.Identity.Service.Exceptions;
+using GreenPipes;
 
 var builder = WebApplication.CreateBuilder(args);
 
