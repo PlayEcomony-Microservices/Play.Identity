@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Play.Identity.Contracts;
 using Play.Identity.Service.Entities;
 using static Duende.IdentityServer.IdentityServerConstants;
 
@@ -16,9 +18,11 @@ namespace Play.Identity.Service.Controllers
     public class UsersController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> userManager;
-        public UsersController(UserManager<ApplicationUser> userManager)
+        private readonly IPublishEndpoint publishEndpoint;
+        public UsersController(UserManager<ApplicationUser> userManager, IPublishEndpoint publishEndpoint)
         {
             this.userManager = userManager;
+            this.publishEndpoint = publishEndpoint;
         }
 
         [HttpGet]
@@ -26,7 +30,7 @@ namespace Play.Identity.Service.Controllers
         {
             var users = userManager.Users.ToList().Select(u => u.AsDto());
 
-            if(users is null) return NotFound();
+            if (users is null) return NotFound();
 
             return Ok(users);
         }
@@ -36,11 +40,11 @@ namespace Play.Identity.Service.Controllers
         {
             var user = await userManager.FindByIdAsync(id.ToString());
 
-            if(user is null) return NotFound();
+            if (user is null) return NotFound();
 
             return Ok(user.AsDto());
         }
-        
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAsync(Guid id, UpdateUserDto userDto)
         {
@@ -54,6 +58,8 @@ namespace Play.Identity.Service.Controllers
 
             await userManager.UpdateAsync(user);
 
+            await publishEndpoint.Publish(new UserUpdated(user.Id, user.Email, user.Gil));
+
             return NoContent();
         }
 
@@ -66,6 +72,7 @@ namespace Play.Identity.Service.Controllers
 
             await userManager.DeleteAsync(user);
 
+            await publishEndpoint.Publish(new UserUpdated(user.Id, user.Email, 0));
             return NoContent();
         }
 
