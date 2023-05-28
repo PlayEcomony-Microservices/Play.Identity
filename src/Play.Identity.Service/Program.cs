@@ -1,3 +1,5 @@
+using System.Reflection;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,7 +18,7 @@ using Play.Common.MassTransit;
 using MassTransit;
 using Play.Identity.Service.Exceptions;
 using GreenPipes;
-
+using Microsoft.AspNetCore.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +56,7 @@ services.AddIdentityServer(options =>
             options.Events.RaiseSuccessEvents = true;
             options.Events.RaiseFailureEvents = true;
             options.Events.RaiseErrorEvents = true;
+            options.KeyManagement.KeyPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         })
         .AddAspNetIdentity<ApplicationUser>()
         .AddInMemoryApiScopes(identityServerSettings.ApiScopes)
@@ -100,6 +103,11 @@ app.UseRouting();
 app.UseIdentityServer();
 
 app.UseAuthorization();
+
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    MinimumSameSitePolicy = SameSiteMode.Lax
+});
 
 app.MapControllers();
 app.MapRazorPages();
