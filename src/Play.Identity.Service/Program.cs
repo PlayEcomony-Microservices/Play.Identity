@@ -35,7 +35,7 @@ var identityServerSettings = Configuration.GetSection(nameof(IdentityServerSetti
 const string AllowedOriginSetting = "AllowedOrigin";
 
 services.Configure<IdentitySettings>(Configuration.GetSection(nameof(IdentitySettings)))
-       .AddDefaultIdentity<ApplicationUser>()
+        .AddDefaultIdentity<ApplicationUser>()
         .AddRoles<ApplicationRole>()
         .AddMongoDbStores<ApplicationUser, ApplicationRole, Guid>
         (
@@ -43,10 +43,9 @@ services.Configure<IdentitySettings>(Configuration.GetSection(nameof(IdentitySet
             serviceSettings.ServiceName
         );
 
-services.AddMassTransitWithRabbitMq(retryConfigurator  => 
+services.AddMassTransitWithRabbitMq(retryConfigurator =>
 {
     retryConfigurator.Interval(3, TimeSpan.FromSeconds(4));
-
     retryConfigurator.Ignore(typeof(UnknownUserException));
     retryConfigurator.Ignore(typeof(InsufficientFundsException));
 });
@@ -56,14 +55,13 @@ services.AddIdentityServer(options =>
             options.Events.RaiseSuccessEvents = true;
             options.Events.RaiseFailureEvents = true;
             options.Events.RaiseErrorEvents = true;
-            options.KeyManagement.KeyPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         })
         .AddAspNetIdentity<ApplicationUser>()
         .AddInMemoryApiScopes(identityServerSettings.ApiScopes)
         .AddInMemoryApiResources(identityServerSettings.ApiResources)
         .AddInMemoryClients(identityServerSettings.Clients)
-        .AddInMemoryIdentityResources(identityServerSettings.IdentityResources);
-    
+        .AddInMemoryIdentityResources(identityServerSettings.IdentityResources)
+        .AddDeveloperSigningCredential();
 
 services.AddLocalApiAuthentication();
 
@@ -79,7 +77,7 @@ services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-if(app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
 
     app.UseDeveloperExceptionPage();
@@ -87,7 +85,8 @@ if(app.Environment.IsDevelopment())
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Play.Identity.Service v1"));
 
 
-    app.UseCors(builder =>{
+    app.UseCors(builder =>
+    {
         builder.WithOrigins(Configuration[AllowedOriginSetting])
         .AllowAnyHeader()
         .AllowAnyHeader();
