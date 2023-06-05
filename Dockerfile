@@ -19,7 +19,7 @@ RUN --mount=type=secret,id=GH_OWNER,dst=/GH_OWNER  --mount=type=secret,id=GH_PAT
 RUN dotnet restore "src/Play.Identity.Service/Play.Identity.Service.csproj"
 COPY ./src ./src
 WORKDIR "/src/Play.Identity.Service"
-RUN dotnet publish "Play.Identity.Service.csproj" -c Release --no-restore -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Play.Identity.Service.csproj" -c Release --no-restore -o /app/publish 
 
 FROM base AS final
 WORKDIR /app
