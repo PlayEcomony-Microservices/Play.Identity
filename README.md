@@ -27,5 +27,6 @@ docker build --secret id=GH_OWNER --secret id=GH_PAT -t play.identity:$version .
 ```powershell
 $adminPass="[password here]"
 $cosmosDbConnStr="[CONN STRING HERE]"
-docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnStr -e RabbitMQSettings__Host=rabbitmq -e IdentitySettings__AdminUserPassword=$adminPass --network playinfra_default play.identity:$version
+$serviceBusConnString="[CONN STRING HERE]"
+docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnStr -e ServiceBusSettings__ConnectionString=$serviceBusConnString -e ServiceSettings__MessageBroker="SERVICEBUS" -e dentitySettings__AdminUserPassword=$adminPass play.identity:$version
 ```
