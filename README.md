@@ -6,7 +6,7 @@ ASP.NET Core Identity project to use an no-SQL based DB, this one will use Mongo
 ## Create and Publish Play.Identity.Contracts NuGet package to GitHub
 
 ```powershell
-$version="1.0.6"
+$version="1.0.7"
 $owner="PlayEcomony-Microservices"
 $gh_pat="[PAT HERE]"
 dotnet pack src\Play.Identity.Contracts --configuration Release -p:PackageVersion=$version -p:RepositoryUrl=https://github.com/$owner/Play.Identity -o ..\packages
@@ -27,5 +27,6 @@ docker build --secret id=GH_OWNER --secret id=GH_PAT -t play.identity:$version .
 ```powershell
 $adminPass="[password here]"
 $cosmosDbConnStr="[CONN STRING HERE]"
-docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnStr -e RabbitMQSettings__Host=rabbitmq -e IdentitySettings__AdminUserPassword=$adminPass --network playinfra_default play.identity:$version
+$serviceBusConnString="[CONN STRING HERE]"
+docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnStr -e ServiceBusSettings__ConnectionString=$serviceBusConnString -e ServiceSettings__MessageBroker="SERVICEBUS" -e dentitySettings__AdminUserPassword=$adminPass play.identity:$version
 ```

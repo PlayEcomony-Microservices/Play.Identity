@@ -1,5 +1,3 @@
-using System.Reflection;
-using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,7 +11,6 @@ using Play.Common.Settings;
 using Play.Identity.Service.Entities;
 using Play.Identity.Service.Settings;
 using Play.Identity.Service.HostedServices;
-using Microsoft.AspNetCore.Identity;
 using Play.Common.MassTransit;
 using MassTransit;
 using Play.Identity.Service.Exceptions;
@@ -43,7 +40,7 @@ services.Configure<IdentitySettings>(Configuration.GetSection(nameof(IdentitySet
             serviceSettings.ServiceName
         );
 
-services.AddMassTransitWithRabbitMq(retryConfigurator =>
+services.AddMassTransitWithMessageBroker(Configuration, retryConfigurator =>
 {
     retryConfigurator.Interval(3, TimeSpan.FromSeconds(4));
     retryConfigurator.Ignore(typeof(UnknownUserException));
