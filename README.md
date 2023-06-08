@@ -36,6 +36,5 @@ docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionS
 
 ```powershell
 az acr login --name $acrName
-docker tag play.identity:$version "$acrName.azurecr.io/play.identity:$version"
 docker push "$acrName.azurecr.io/play.identity:$version"
 ```
