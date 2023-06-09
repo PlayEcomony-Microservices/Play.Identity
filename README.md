@@ -1,7 +1,7 @@
 # Play.Identity
 
-ASP.NET Core Identity project to handle authorization and authentication of PlayEconomy microservices. Instead of the usual marriage of
-ASP.NET Core Identity project to use an no-SQL based DB, this one will use MongoDB.
+ASP.NET Core Identity project to handle authorization and authentication for PlayEconomy microservices. Instead of the usual marriage of
+ASP.NET Core Identity project with no-SQL based DB, this one will use MongoDB.
 
 ## Create and Publish Play.Identity.Contracts NuGet package to GitHub
 
