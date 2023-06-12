@@ -29,7 +29,7 @@ docker build --secret id=GH_OWNER --secret id=GH_PAT -t "$acrName.azurecr.io/pla
 $adminPass="[password here]"
 $cosmosDbConnStr="[CONN STRING HERE]"
 $serviceBusConnString="[CONN STRING HERE]"
-docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnStr -e ServiceBusSettings__ConnectionString=$serviceBusConnString -e ServiceSettings__MessageBroker="SERVICEBUS" -e dentitySettings__AdminUserPassword=$adminPass play.identity:$version
+docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnStr -e ServiceBusSettings__ConnectionString=$serviceBusConnString -e ServiceSettings__MessageBroker="SERVICEBUS" -e IdentitySettings__AdminUserPassword=$adminPass play.identity:$version
 ```
 
 ## Publish docker image to Azure Container Registry
@@ -37,4 +37,17 @@ docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionS
 ```powershell
 az acr login --name $acrName
 docker push "$acrName.azurecr.io/play.identity:$version"
+```
+
+## Create the Kubernetes namespace
+
+```powershell
+$namespace="identity"
+kubectl create namespace $namespace
+```
+
+## Create the Kubernetes secrets
+
+```powershell
+kubectl create secret generic identity-secrets --from-literal=cosmosdb-connectionstring=$cosmosDbConnStr --from-literal=servicebus-connectionstring=$serviceBusConnString --from-literal=admin-password=$adminPass -n $namespace
 ```

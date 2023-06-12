@@ -17,6 +17,18 @@ spec:
           env:
             - name: ServiceSettings__MessageBroker
               value: SERVICEBUS
+            - name: MongoDbSettings__ConnectionString
+              valueFrom:
+               name: identity-secrets
+               key: cosmosdb-connectionstring
+            - name: ServiceBusSettings__ConnectionString
+              valueFrom:
+                name: identity-secrets
+                key: servicebus-connectionstring
+            - name: IdentitySettings__AdminUserPassword
+              valueFrom:
+                name: identity-secrets
+                key: admin-password
           resources:
             limits:
               memory: "128Mi"
