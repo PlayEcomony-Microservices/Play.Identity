@@ -72,6 +72,8 @@ services.AddSwaggerGen(c =>
 });
 
 
+services.AddHealthChecks();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -107,5 +109,6 @@ app.UseCookiePolicy(new CookiePolicyOptions
 
 app.MapControllers();
 app.MapRazorPages();
+app.MapHealthChecks("/health");
 
 app.Run();
