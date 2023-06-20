@@ -16,10 +16,7 @@ using MassTransit;
 using Play.Identity.Service.Exceptions;
 using GreenPipes;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Play.Identity.Service.HealthChecks;
-using MongoDB.Driver;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Play.Common.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,17 +74,7 @@ services.AddSwaggerGen(c =>
 
 
 services.AddHealthChecks()
-        .Add(new HealthCheckRegistration(
-            "mongodb",
-            serviceProvider =>
-            {
-                var mongoClient = new MongoClient(mongoDbSettings.ConnectionString);
-                return new MongoDbHealthCheck(mongoClient);
-            },
-            HealthStatus.Unhealthy,
-            new[] { "ready" },
-            TimeSpan.FromSeconds(3)
-        ));
+        .AddMongoDb();
 
 var app = builder.Build();
 
@@ -124,13 +111,6 @@ app.UseCookiePolicy(new CookiePolicyOptions
 
 app.MapControllers();
 app.MapRazorPages();
-app.MapHealthChecks("/health/ready", new HealthCheckOptions()
-{
-    Predicate = check => check.Tags.Contains("ready")
-});
-app.MapHealthChecks("/health/live", new HealthCheckOptions()
-{
-    Predicate = check => false
-});
+app.MapPlayEconomyHealthChecks();
 
 app.Run();
