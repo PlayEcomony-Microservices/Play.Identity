@@ -17,6 +17,7 @@ using Play.Identity.Service.Exceptions;
 using GreenPipes;
 using Microsoft.AspNetCore.Http;
 using Play.Common.HealthChecks;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,6 +77,22 @@ services.AddSwaggerGen(c =>
 services.AddHealthChecks()
         .AddMongoDb();
 
+
+var host = builder.Host;
+
+host.ConfigureAppConfiguration((context, configurationBuilder) =>
+{
+    if(context.HostingEnvironment.IsProduction())
+    {
+        configurationBuilder.AddAzureKeyVault(
+            new Uri("https://playeconomybkm.vault.azure.net/"),
+            new DefaultAzureCredential()
+        );
+    }
+});
+
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -112,5 +129,7 @@ app.UseCookiePolicy(new CookiePolicyOptions
 app.MapControllers();
 app.MapRazorPages();
 app.MapPlayEconomyHealthChecks();
+
+
 
 app.Run();

@@ -6,7 +6,7 @@ ASP.NET Core Identity project with no-SQL based DB, this one will use MongoDB.
 ## Create and Publish Play.Identity.Contracts NuGet package to GitHub
 
 ```powershell
-$version="1.0.9"
+$version="1.0.10"
 $owner="PlayEcomony-Microservices"
 $gh_pat="[PAT HERE]"
 dotnet pack src\Play.Identity.Contracts --configuration Release -p:PackageVersion=$version -p:RepositoryUrl=https://github.com/$owner/Play.Identity -o ..\packages
